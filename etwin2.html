@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title id="TARGET">Autentikasi Jaringan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --danger: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 50%, #f3e8ff 100%);
+            --shape1-bg: #93c5fd;
+            --shape2-bg: #c4b5fd;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.5);
+            --input-focus-bg: #ffffff;
+            --input-border: rgba(0, 0, 0, 0.1);
+            --label-float-bg: #ffffff;
+            --divider: rgba(0, 0, 0, 0.05);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #60a5fa;
+                --primary-hover: #3b82f6;
+                --text-dark: #f1f5f9;
+                --text-light: #94a3b8;
+                --danger: #f87171;
+                --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #090d16 100%);
+                --shape1-bg: #1d4ed8;
+                --shape2-bg: #5b21b6;
+                --glass-bg: rgba(30, 41, 59, 0.7);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --input-bg: rgba(15, 23, 42, 0.5);
+                --input-focus-bg: #0f172a;
+                --input-border: rgba(255, 255, 255, 0.1);
+                --label-float-bg: #1e293b;
+                --divider: rgba(255, 255, 255, 0.05);
+                --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            padding: 16px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .bg-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+        }
+        .shape1 {
+            width: 400px; height: 400px;
+            background: var(--shape1-bg);
+            top: -100px; left: -100px;
+        }
+        .shape2 {
+            width: 300px; height: 300px;
+            background: var(--shape2-bg);
+            bottom: -50px; right: -50px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 36px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--card-shadow);
+            animation: slideUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            margin: auto;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .time-widget {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--divider);
+        }
+
+        .greeting {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .time {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .network-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .network-info h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .wifi-icon {
+            width: 20px; height: 20px;
+            stroke: var(--text-dark);
+            flex-shrink: 0;
+        }
+
+        .error-badge {
+            display: none; /* Disembunyikan secara default */
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 52px 16px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            background: var(--input-focus-bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label {
+            top: 0;
+            background: var(--label-float-bg);
+            padding: 0 4px;
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            transition: color 0.3s;
+            z-index: 2;
+        }
+
+        .toggle-btn:hover {
+            color: var(--primary);
+        }
+
+        .toggle-btn svg {
+            width: 22px; 
+            height: 22px;
+            overflow: visible; 
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 480px) {
+            .glass-card { padding: 28px 20px; }
+            .time { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container">
+        <div class="bg-shape shape1"></div>
+        <div class="bg-shape shape2"></div>
+    </div>
+
+    <div class="glass-card">
+        
+        <div class="time-widget">
+            <div class="greeting" id="salam">Selamat Datang</div>
+            <div class="time" id="jam">00:00:00</div>
+            <div class="date" id="kalender">Memuat tanggal...</div>
+        </div>
+
+        <div class="network-info">
+            <h2>
+                <svg class="wifi-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8.485 14.485a5 5 0 017.03 0M4.95 10.95a10 10 0 0114.1 0M1.414 7.414a15 15 0 0121.17 0"></path>
+                </svg>
+                <span id="SSID">Menghubungkan...</span>
+            </h2>
+            <!-- Ditambahkan id="errorBadge" agar bisa dikontrol lewat JS -->
+            <div class="error-badge" id="errorBadge">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Authentication Problem
+            </div>
+        </div>
+
+        <form action="/">
+            <div class="input-group">
+                <input type="password" id="password" name="password" minlength="8" required placeholder=" " autocomplete="current-password">
+                <label for="password">Masukkan Password Wi-Fi</label>
+                <button type="button" class="toggle-btn" onclick="togglePassword()" aria-label="Tampilkan password">
+                    <svg id="iconEye" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                </button>
+            </div>
+            <button type="submit" class="submit-btn">Sambungkan Jaringan</button>
+        </form>
+
+        <div class="footer">
+            &copy; 2026 Secured Network
+        </div>
+    </div>
+
+    <script>
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200) {
+                var respons = this.responseText.trim();
+                document.getElementById("SSID").innerText = respons ? respons : "Unknown SSID";
+                
+                // Menampilkan badge Authentication Problem setelah SSID selesai dimuat
+                document.getElementById("errorBadge").style.display = "inline-flex";
+            }
+        };
+        xhttp.open("GET", "/CurrentTarget", true);
+        xhttp.send();
+
+        function getAutoTimeZone() {
+            try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Jakarta"; } 
+            catch(e) { return "Asia/Jakarta"; }
+        }
+
+        function updateWaktu() {
+            var userTimeZone = getAutoTimeZone();
+            var sekarang = new Date();
+
+            var opsiJam = { timeZone: userTimeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            var waktuStr = new Intl.DateTimeFormat('id-ID', opsiJam).format(sekarang);
+            document.getElementById("jam").innerText = waktuStr.includes('.') ? waktuStr.replace(/\./g, ':') : waktuStr;
+
+            var opsiTanggal = { timeZone: userTimeZone, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("kalender").innerText = new Intl.DateTimeFormat('id-ID', opsiTanggal).format(sekarang);
+
+            var opsiJamAngka = { timeZone: userTimeZone, hour: 'numeric', hour12: false };
+            var jamAngka = parseInt(new Intl.DateTimeFormat('en-US', opsiJamAngka).format(sekarang), 10);
+            
+            var ucapan = "Selamat Malam";
+            if (jamAngka >= 5 && jamAngka < 11) ucapan = "Selamat Pagi";
+            else if (jamAngka >= 11 && jamAngka < 15) ucapan = "Selamat Siang";
+            else if (jamAngka >= 15 && jamAngka < 18) ucapan = "Selamat Sore";
+            
+            document.getElementById("salam").innerText = ucapan;
+        }
+
+        setInterval(updateWaktu, 1000);
+        updateWaktu();
+
+        function togglePassword() {
+            var input = document.getElementById("password");
+            var icon = document.getElementById("iconEye");
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+            } else {
+                input.type = "password";
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+            }
+        }
+    </script>
+</body>
+  </html>
+  
